@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JAYS CHAT</title>
+  <!-- Google Fonts for a clean, modern look -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-p+1PT0mWubjvWcP3Wn0lKFoFvyVz5Gv98kN0I4uUlnE1G8xqh6b6fY6H/+pX9Ik0llL+gN7mX4jrlxK9Qq6D7A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 1rem;
+    }
+    .auth-container {
+      background: #fff;
+      width: 100%;
+      max-width: 400px;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+      position: relative;
+      overflow: hidden;
+    }
+    .auth-header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .auth-header h1 {
+      margin: 0;
+      color: #1e3c72;
+      font-size: 2.5rem;
+    }
+    .auth-header p {
+      margin: 0.25rem 0 0.75rem;
+      color: #333;
+      font-weight: 500;
+    }
+    .tab-buttons {
+      display: flex;
+      margin-bottom: 1.5rem;
+    }
+    .tab-buttons button {
+      flex: 1;
+      padding: 0.75rem;
+      border: none;
+      background: #f1f1f1;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.3s ease;
+    }
+    .tab-buttons button.active {
+      background: #1e3c72;
+      color: #fff;
+    }
+    .auth-form {
+      display: none;
+      flex-direction: column;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .auth-form.active {
+      display: flex;
+      opacity: 1;
+    }
+    .auth-form label {
+      margin-bottom: 0.25rem;
+      font-weight: 500;
+    }
+    .auth-form input {
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      width: 100%;
+    }
+    .password-field {
+      position: relative;
+    }
+    .password-field input {
+      padding-right: 2.5rem;
+    }
+    .password-field .toggle-password {
+      position: absolute;
+      right: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #888;
+    }
+    .auth-form button {
+      padding: 0.75rem;
+      background: #1e3c72;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.3s ease;
+    }
+    .auth-form button:hover {
+      background: #16305a;
+    }
+    .forgot-password {
+      text-align: right;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      color: #1e3c72;
+    }
+    .divider {
+      text-align: center;
+      margin: 1.5rem 0;
+      position: relative;
+    }
+    .divider::before,
+    .divider::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      width: 40%;
+      height: 1px;
+      background: #ccc;
+    }
+    .divider::before {
+      left: 0;
+    }
+    .divider::after {
+      right: 0;
+    }
+    .divider span {
+      padding: 0 1rem;
+      background: #fff;
+      position: relative;
+      z-index: 1;
+      font-size: 0.9rem;
+      color: #888;
+    }
+    .google-button {
+      padding: 0.75rem;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+      color: #444;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s ease;
+    }
+    .google-button:hover {
+      background: #f7f7f7;
+    }
+    .google-button i {
+      margin-right: 0.5rem;
+      font-size: 1.2rem;
+      color: #db4437;
+    }
+    .error-message {
+      color: red;
+      font-size: 0.9rem;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    @media (max-width: 480px) {
+      .auth-container {
+        padding: 1.5rem;
+      }
+      .auth-header h1 {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-container">
+    <div class="auth-header">
+      <h1>JAYS CHAT</h1>
+      <p>Please Login or Sign Up</p>
+    </div>
+    <div class="tab-buttons">
+      <button id="login-tab" class="active">Login</button>
+      <button id="signup-tab">Sign Up</button>
+    </div>
+    <!-- Login Form -->
+    <form id="login-form" class="auth-form active">
+      <div class="error-message" id="login-error"></div>
+      <input type="email" id="login-email" placeholder="Email" required />
+      <div class="password-field">
+        <input type="password" id="login-password" placeholder="Password" required />
+        <i class="fa-solid fa-eye toggle-password" data-target="login-password"></i>
+      </div>
+      <div class="forgot-password" id="forgot-password">Forgot Password?</div>
+      <button type="submit">Login</button>
+    </form>
+    <!-- Signup Form -->
+    <form id="signup-form" class="auth-form">
+      <div class="error-message" id="signup-error"></div>
+      <input type="text" id="signup-fullname" placeholder="Full Name" required />
+      <input type="text" id="signup-username" placeholder="Username" required />
+      <input type="email" id="signup-email" placeholder="Email" required />
+      <div class="password-field">
+        <input type="password" id="signup-password" placeholder="Password" required />
+        <i class="fa-solid fa-eye toggle-password" data-target="signup-password"></i>
+      </div>
+      <button type="submit">Sign Up</button>
+    </form>
+    <div class="divider"><span>OR</span></div>
+    <button id="google-auth" class="google-button">
+      <i class="fab fa-google"></i> Sign in with Google
+    </button>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script type="module">
+    // Import Firebase modules
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics.js";
+    import { 
+      getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, 
+      sendPasswordResetEmail, GoogleAuthProvider, signInWithPopup 
+    } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+
+    // Your Firebase configuration (replace with your own details)
+    const firebaseConfig = {
+      apiKey: "AIzaSyBtJ6eEaapIjzSM9hS69Du9S3oCVYBe1Ac",
+      authDomain: "jay-chat-91d02.firebaseapp.com",
+      databaseURL: "https://jay-chat-91d02-default-rtdb.firebaseio.com",
+      projectId: "jay-chat-91d02",
+      storageBucket: "jay-chat-91d02.firebasestorage.app",
+      messagingSenderId: "627949387755",
+      appId: "1:627949387755:web:ff63a69b2a0bf9533163ae",
+      measurementId: "G-2X9DG6HV7D"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const auth = getAuth();
+    const db = getFirestore();
+
+    // Tab switching functionality
+    const loginTab = document.getElementById("login-tab");
+    const signupTab = document.getElementById("signup-tab");
+    const loginForm = document.getElementById("login-form");
+    const signupForm = document.getElementById("signup-form");
+
+    loginTab.addEventListener("click", () => {
+      loginTab.classList.add("active");
+      signupTab.classList.remove("active");
+      loginForm.classList.add("active");
+      signupForm.classList.remove("active");
+    });
+
+    signupTab.addEventListener("click", () => {
+      signupTab.classList.add("active");
+      loginTab.classList.remove("active");
+      signupForm.classList.add("active");
+      loginForm.classList.remove("active");
+    });
+
+    // Toggle password visibility
+    const toggleIcons = document.querySelectorAll(".toggle-password");
+    toggleIcons.forEach(icon => {
+      icon.addEventListener("click", () => {
+        const targetId = icon.getAttribute("data-target");
+        const inputField = document.getElementById(targetId);
+        if (inputField.type === "password") {
+          inputField.type = "text";
+          icon.classList.remove("fa-eye");
+          icon.classList.add("fa-eye-slash");
+        } else {
+          inputField.type = "password";
+          icon.classList.remove("fa-eye-slash");
+          icon.classList.add("fa-eye");
+        }
+      });
+    });
+
+    // Handle Forgot Password
+    document.getElementById("forgot-password").addEventListener("click", async () => {
+      const email = document.getElementById("login-email").value;
+      if (!email) {
+        alert("Please enter your email address first.");
+        return;
+      }
+      try {
+        await sendPasswordResetEmail(auth, email);
+        alert("Password reset email sent. Please check your inbox.");
+      } catch (error) {
+        alert("Error: " + error.message);
+      }
+    });
+
+    // Handle Signup
+    document.getElementById("signup-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const fullname = document.getElementById("signup-fullname").value;
+      const username = document.getElementById("signup-username").value;
+      const email = document.getElementById("signup-email").value;
+      const password = document.getElementById("signup-password").value;
+      const errorDiv = document.getElementById("signup-error");
+      errorDiv.textContent = "";
+      try {
+        // Create user using Firebase Authentication
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        // Store additional user details in Firestore
+        await setDoc(doc(db, "users", user.uid), {
+          fullName: fullname,
+          username: username,
+          email: email,
+          createdAt: new Date()
+        });
+        console.log("User signed up and data stored:", user);
+        alert("Signup successful! Redirecting...");
+        window.location.href = "dashboard.html";
+      } catch (error) {
+        console.error("Signup error:", error);
+        errorDiv.textContent = error.message;
+      }
+    });
+
+    // Handle Login
+    document.getElementById("login-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("login-email").value;
+      const password = document.getElementById("login-password").value;
+      const errorDiv = document.getElementById("login-error");
+      errorDiv.textContent = "";
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        console.log("User logged in:", userCredential.user);
+        alert("Login successful! Redirecting...");
+        window.location.href = "dashboard.html";
+      } catch (error) {
+        console.error("Login error:", error);
+        errorDiv.textContent = error.message;
+      }
+    });
+
+    // Handle Google Authentication with additional sessionStorage check
+    document.getElementById("google-auth").addEventListener("click", async () => {
+      // Check if sessionStorage is accessible
+      try {
+        sessionStorage.setItem("test", "test");
+        sessionStorage.removeItem("test");
+      } catch (e) {
+        alert("Browser sessionStorage is inaccessible. Please enable cookies and session storage.");
+        return;
+      }
+      // Clear session storage to avoid stale data
+      sessionStorage.clear();
+      const provider = new GoogleAuthProvider();
+      try {
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+        // Save or merge Google user data into Firestore
+        await setDoc(doc(db, "users", user.uid), {
+          fullName: user.displayName || "",
+          username: user.email ? user.email.split('@')[0] : "",
+          email: user.email,
+          createdAt: new Date()
+        }, { merge: true });
+        alert("Google sign in successful! Redirecting...");
+        window.location.href = "https://ceecodes001.github.io/Profile/";
+      } catch (error) {
+        alert("Google sign in error: " + error.message);
+      }
+    });
+  </script>
+</body>
+</html>
